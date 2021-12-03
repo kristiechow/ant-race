@@ -25,16 +25,16 @@ export default function Main() {
               result.ants[3].calculation = 'Not yet run';
               result.ants[4].calculation = 'Not yet run';
 
+              result.ants[0].likelihood = 0;
+              result.ants[1].likelihood = 0;
+              result.ants[2].likelihood = 0;
+              result.ants[3].likelihood = 0;
+              result.ants[4].likelihood = 0;
+
               setIsLoaded(true);
               setAnts(Object.keys(result).map((key) => result[key])[0]);
               setgetDataClicked(false);
-              console.log(ants);
-              console.log(Object.keys(result).map((key) => result[key]));
-            
 
-              const likelihoods = generateAntWinLikelihoodCalculator();
-              setLikelihoods({ likelihoods });
-              console.log(likelihoods)
             },
             (error) => {
               setIsLoaded(true);
@@ -44,24 +44,31 @@ export default function Main() {
     }
 
     const onStartRaceClick = () => {
-        ants.map(ant =>
-          ant.calculation = generateAntWinLikelihoodCalculator()
-        )
-        const res = generateAntWinLikelihoodCalculator();
-        console.log(ants);
-        console.log(res);
+        setRaceState("In progress");
+        console.log(ants)
       };
-  
-      const generateAntWinLikelihoodCalculator = () => {
-          const delay = 7000 + Math.random() * 7000;
-          const likelihoodOfAntWinning = Math.random();
+
+    const onconsoleClick = async () => {
+      const likelihood = await generateAntWinLikelihoodCalculator;
+      console.log(likelihood)
+      ants[0].likelihood = likelihood
+    }
+
+    const onconsoleClick2 = () => {
+      console.log(ants);
+    };
         
-          return (callback) => {
-            setTimeout(() => {
-              callback(likelihoodOfAntWinning);
-            }, delay);
-          };
+      function generateAntWinLikelihoodCalculator() {
+        const delay = 7000 + Math.random() * 7000;
+        const likelihoodOfAntWinning = Math.random();
+      
+        return (callback) => {
+          setTimeout(() => {
+            callback(likelihoodOfAntWinning);
+          }, delay);
+        };
       }
+
 
     const data = React.useMemo(
         () => ants
@@ -115,6 +122,12 @@ export default function Main() {
                 </RowFlex>
                 <RowFlex>
                     <Button onClick={onStartRaceClick}>START RACE</Button>
+                </RowFlex>
+                <RowFlex>
+                    <Button onClick={onconsoleClick}>console RACE</Button>
+                </RowFlex>
+                <RowFlex>
+                    <Button onClick={onconsoleClick2}>console</Button>
                 </RowFlex>
                 <RowFlex>
                     STATE OF THE RACE: {raceState}
