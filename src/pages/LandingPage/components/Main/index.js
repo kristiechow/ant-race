@@ -1,17 +1,16 @@
 import React, { useState }  from "react";
 import { RowFlex, ColumnFlex, Screen } from "../../styles";
-import { Picture, HeavyText, LightText } from "./styles";
+import { LightText } from "./styles";
 import { useTable } from "react-table";
 import Button from "./Button";
+import { generateAntWinLikelihoodCalculator } from "../../../../../src/calculationFunction";
 
 export default function Main() {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [ants, setAnts] = useState([]);
-    const [startRaceState, setStartRace] = useState(0);
     const [getDataClicked, setgetDataClicked] = useState(false);
     const [raceState, setRaceState] = useState('Not yet run');
-    const [likelihoods, setLikelihoods] = useState([]);
 
     const onGetDataClick = () => {
         setgetDataClicked(true);
@@ -44,41 +43,60 @@ export default function Main() {
     }
 
     const onStartRaceClick = () => {
-        setRaceState("In progress");
-        console.log(ants)
+        setRaceState("In progress...");
+        var theAnts = ants.map(l => Object.assign({}, l));
+
+        for (var i = 0; i < ants.length; i++){
+          theAnts[i].calculation = 'In progress';
+          setAnts(theAnts);
+          calculateLikelihood(ants[i], i);
+        }
       };
 
-    const onconsoleClick = async () => {
-      const likelihood = await generateAntWinLikelihoodCalculator;
-      console.log(likelihood)
-      ants[0].likelihood = likelihood
+    const checkRaceState = () => {
+      var completedCount = 0
+      var theAnts = ants.map(l => Object.assign({}, l));
+      theAnts = theAnts.sort((a, b) => b.likelihood - a.likelihood);
+      setAnts(theAnts);
+
+      for (var i = 0; i < ants.length; i++) {
+        if (ants[i].calculation == 'Calculated'){
+          completedCount += 1
+        }
+      }
+      if (completedCount == ants.length){
+        setRaceState("Calculated");
+      }
     }
 
-    const onconsoleClick2 = () => {
-      console.log(ants);
+    const calculate = (ant) => {
+      return new Promise((resolve) => {
+          resolve(ant);
+      });
     };
-        
-      function generateAntWinLikelihoodCalculator() {
-        const delay = 7000 + Math.random() * 7000;
-        const likelihoodOfAntWinning = Math.random();
-      
-        return (callback) => {
-          setTimeout(() => {
-            callback(likelihoodOfAntWinning);
-          }, delay);
-        };
-      }
 
+    const calculateLikelihood = (ant, index) => { 
+      const generateCalculation = generateAntWinLikelihoodCalculator();
+      ants[index].calculation = 'In progress';
 
-    const data = React.useMemo(
-        () => ants
-    )
+      return generateCalculation((ant) => {
+        calculate(ant).then((calculation) => {
+          ants[index].likelihood = calculation
+          ants[index].calculation = 'Calculated';
+          checkRaceState();
+        });
+      });
+    };
+
+    // Table Rows and Columns
+
+    var data = ants
 
     const columns = React.useMemo(
         () => [
           {
             Header: 'Name',
-            accessor: 'name', // accessor is the "key" in the data
+            accessor: 'name', 
           },
           {
             Header: 'Length',
@@ -95,6 +113,10 @@ export default function Main() {
           {
             Header: 'State of Calcluation',
             accessor: 'calculation',
+          },
+          {
+            Header: 'Win Likelihood',
+            accessor: 'likelihood',
           },
         ],
         []
@@ -119,21 +141,13 @@ export default function Main() {
                 <ColumnFlex>
                 <RowFlex>
                     <Button onClick={onGetDataClick}>GET DATA</Button>
+                    <Button onClick={onStartRaceClick} style={{marginLeft: "15px", backgroundColor:"#38782A"}}>START RACE</Button>
                 </RowFlex>
                 <RowFlex>
-                    <Button onClick={onStartRaceClick}>START RACE</Button>
+                    <LightText>STATE OF THE RACE:   {raceState}</LightText>
                 </RowFlex>
                 <RowFlex>
-                    <Button onClick={onconsoleClick}>console RACE</Button>
-                </RowFlex>
-                <RowFlex>
-                    <Button onClick={onconsoleClick2}>console</Button>
-                </RowFlex>
-                <RowFlex>
-                    STATE OF THE RACE: {raceState}
-                </RowFlex>
-                <RowFlex>
-                <table {...getTableProps()} style={{ border: 'solid 1px black' }}>
+                <table {...getTableProps()} style={{ border: 'solid 1px gray' }}>
                     <thead>
                         {headerGroups.map(headerGroup => (
                         <tr {...headerGroup.getHeaderGroupProps()}>
@@ -162,7 +176,7 @@ export default function Main() {
                                 <td
                                     {...cell.getCellProps()}
                                     style={{
-                                    padding: '10px'
+                                    padding: '12px'
                                     }}
                                 >
                                     {cell.render('Cell')}

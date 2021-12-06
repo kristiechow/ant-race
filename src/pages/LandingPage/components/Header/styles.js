@@ -1,23 +1,25 @@
 import styled from "styled-components";
 
 export const LightText = styled.h1`
-  font-size: 30px;
-  line-height: 33px;
+  font-size: 20px;
   color: #333333;
+  padding-bottom: 20px;
 `;
 
 export const HeavyText = styled.h1`
   font-weight: bold;
-  font-size: 52px;
-  line-height: 57px;
+  font-size: 42px;
   display: flex;
   align-items: center;
 `;
 
 export const Picture = styled.img`
-  max-width: 35vw;
+  max-width: 8vw;
   height: auto;
-  margin-left: 91px;
-  margin-top: 90px;
-  margin-right: 73px;
+  margin-left: 11px;
+  margin-top: 11px;
+  margin-right: 11px;
 `;
+
+
+

@@ -5,9 +5,9 @@ import Main from "./components/Main";
 
 export default function LandingPage() {
   return (
-    <Screen>
+    <Screen style={{paddingLeft: "15px"}}>
       <Header />
-      <Main />
+      <Main/>
     </Screen>
   );
 }
